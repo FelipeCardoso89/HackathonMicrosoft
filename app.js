@@ -35,26 +35,30 @@ bot.recognizer(recognizer);
 
 bot.dialog('Buy', [
     (session, args, next) => {
-        
-        const ammountEntity = builder.EntityRecognizer.findEntity(args.intent.entities, 'Ammount');
-        const bankEntity = builder.EntityRecognizer.findEntity(args.intent.entities, 'Bank');
 
-        if (!bankEntity) {
+        session.dialogData.ammount = builder.EntityRecognizer.findEntity(args.intent.entities, 'Ammount');
+        session.dialogData.bank = builder.EntityRecognizer.findEntity(args.intent.entities, 'Bank');
+
+        if (!session.dialogData.bank) {
             builder.Prompts.choice(
                 session, 
-                `De qual de suas contas você quer esses ${ammountEntity.entity}?`, 
+                `De qual de suas contas você quer esses ${session.dialogData.ammount.entity}?`, 
                 "Itaú|Bradesco|Banco Original", 
                 { listStyle: builder.ListStyle.button }
             );
         } else {
-            
+            next();
         }
     },
     (session, results) => {
 
+        if (!session.dialogData.bank) {
+            session.dialogData.bank = results.response;
+        }
+
         builder.Prompts.choice(
             session, 
-            `Ok, vou precisar da sua permissão para accessar o ${results.response.entity}. Tudo bem?`, 
+            `Ok, vou precisar da sua permissão para accessar o ${session.dialogData.bank.entity}. Tudo bem?`, 
             "Sim|Não", 
             { listStyle: builder.ListStyle.button }
         );
@@ -158,7 +162,7 @@ if (process.env.IS_SPELL_CORRECTION_ENABLED === 'true') {
 const hotelAsAttachment = hotel => {
     return new builder.HeroCard()
         .title(hotel.name)
-        .subtitle('%d curtidas. %d comentários. A partir de $%d ao mês.', hotel.rating, hotel.numberOfReviews, hotel.priceStarting)
+        .subtitle(`${hotel.rating} curtidas. ${hotel.numberOfReviews} comentários. A partir de ${hotel.priceStarting.toFixed(2)}% ao mês.`)
         .images([new builder.CardImage().url(hotel.image)])
         .buttons([
             new builder.CardAction()

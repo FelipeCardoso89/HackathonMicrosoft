@@ -17,8 +17,8 @@ const searchHotels = (destination) => {
                 location: destination,
                 rating: Math.ceil(Math.random() * 5),
                 numberOfReviews: Math.floor(Math.random() * 5000) + 1,
-                priceStarting: Math.floor(Math.random() * 0.0) + 0.10,
-                image: `https://d30y9cdsu7xlg0.cloudfront.net/png/621754-200.png`
+                priceStarting: Math.random() * 0.10,
+                image: `http://icons.iconarchive.com/icons/custom-icon-design/pretty-office-11/512/shop-icon.png`
             };
         });
         hotels.sort((a, b) => { return a.priceStarting - b.priceStarting; });
