@@ -41,15 +41,37 @@ bot.dialog('Buy', [
             builder.Prompts.choice(
                 session, 
                 `De qual de suas contas você quer esses ${ammountEntity.entity}?`, 
-                "Banco do Brasil|Bradesco|Banco Original", 
+                "Itaú|Bradesco|Banco Original", 
                 { listStyle: builder.ListStyle.button }
             );
+        } else {
+            
         }
-
     },
     (session, results) => {
-        const bank = results.response;
-        session.send(`Ok, vou dar uma olhada no ${bank.entity}`);
+
+        builder.Prompts.choice(
+            session, 
+            `Ok, vou precisar da sua permissão para accessar o ${results.response.entity}. Tudo bem?`, 
+            "Sim|Não", 
+            { listStyle: builder.ListStyle.button }
+        );
+    },
+    (session, results) => {
+
+        if (results.response.entity == 'Sim') {
+            
+            session.send(`Tudo certo! Vou analisar seu consumo e já te digo se esta ok usar esse dinhero.`); 
+            session.sendTyping();
+
+            //Chamada do banco original.
+            setTimeout(function () {
+                session.send("Ok, levando em conta o seu consumo mensal, seria melhor você ");
+            }, 6000);
+
+        } else {
+            session.endDialog(`Tudo bem, fique a vontade para voltar quando quizer`); 
+        }
     }
 
 ]).triggerAction({
@@ -57,30 +79,6 @@ bot.dialog('Buy', [
     onInterrupted:  session => {
         session.send('Please provide a destination');
     }
-});
-
-bot.dialog('ShowHotelsReviews', (session, args) => {
-    // retrieve hotel name from matched entities
-    const hotelEntity = builder.EntityRecognizer.findEntity(args.intent.entities, 'Hotel');
-    if (hotelEntity) {
-        session.send(`Looking for reviews of '${hotelEntity.entity}'...`);
-        Store
-            .searchHotelReviews(hotelEntity.entity)
-            .then(reviews => {
-                let message = new builder.Message()
-                    .attachmentLayout(builder.AttachmentLayout.carousel)
-                    .attachments(reviews.map(reviewAsAttachment));
-                session.endDialog(message);
-            });
-    }
-}).triggerAction({
-    matches: 'ShowHotelsReviews'
-});
-
-bot.dialog('Help', session => {
-    session.endDialog(`Hi! Try asking me things like 'search hotels in Seattle', 'search hotels near LAX airport' or 'show me the reviews of The Bot Resort'`);
-}).triggerAction({
-    matches: 'Help'
 });
 
 // Spell Check
