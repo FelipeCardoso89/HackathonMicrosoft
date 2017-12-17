@@ -24,6 +24,7 @@
     "botbuilder": "^3.8.2",
     "dotenv-extended": "^1.0.4",
     "request": "^2.79.0",
-    "restify": "^4.3.0"
+    "restify": "^4.3.0",
+    "superagent": "^3.8.2"
   }
 }

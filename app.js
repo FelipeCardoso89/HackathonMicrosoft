@@ -5,6 +5,8 @@ const builder = require('botbuilder');
 const restify = require('restify');
 const Store = require('./store');
 const spellService = require('./spell-service');
+const http = require('http');
+const request = require('superagent');
 
 // Setup Restify Server
 const server = restify.createServer();
@@ -63,12 +65,15 @@ bot.dialog('Buy', [
             
             session.send(`Tudo certo! Vou analisar seu consumo e já te digo se esta ok usar esse dinhero.`); 
             session.sendTyping();
-
-            //Chamada do banco original.
-            setTimeout(function () {
-                session.send("Ok, levando em conta o seu consumo mensal, seria melhor você ");
-            }, 6000);
-
+            
+            request
+                .get('https://sandbox.original.com.br/accounts/v1/balance')
+                .set('Content-Type', 'application/json')
+                .set('authorization', 'Bearer NDYxODIwMTAtZTMwNC0xMWU3LWE3YzAtMDA1MDU2OWE3MzA1OmV5SmhiR2NpT2lKSVV6STFOaUlzSW5SNWNDSTZJa3BYVkNKOS5leUowZVhCbElqb2lUMEYxZEdnaUxDSnBZWFFpT2pFMU1UTTBPVGt6TVRjc0ltVjRjQ0k2TVRVeE16a3pNVE14Tnl3aVlYVmtJam9pTldJMFpqZG1PR1lpTENKcGMzTWlPaUphZFhBdWJXVWdSMkYwWlhkaGVTSXNJbk4xWWlJNklqUTJNVGd5TURFd0xXVXpNRFF0TVRGbE55MWhOMk13TFRBd05UQTFOamxoTnpNd05TSXNJbXAwYVNJNklqUTNORFF4WTJZd0xXVXpNRFF0TVRGbE55MWlZelV4TFRjeE5HUXdZMlkwTWpBeFl5SjkuMkNna1kwMUF3SmlrSGN5eTg3MjRLVk1tVWo3ellSaXdXOVk1OGxxUVRoaw==')
+                .set('developer-key', '28f955c90b3a2940134ff1a970050f569a87facf')
+                .end((error, response) => {
+                    session.send(`Ok, ${response.body.current_balance}`);
+                })
         } else {
             session.endDialog(`Tudo bem, fique a vontade para voltar quando quizer`); 
         }
