@@ -31,7 +31,7 @@ var bot = new builder.UniversalBot(connector, function (session) {
 const recognizer = new builder.LuisRecognizer(process.env.LUIS_MODEL_URL);
 bot.recognizer(recognizer);
 
-bot.dialog('Comprar', [
+bot.dialog('SearchHotels', [
     (session, args, next) => {
         session.send(`Welcome to the Hotels finder! We are analyzing your message: 'session.message.text'`);
         // try extracting entities
