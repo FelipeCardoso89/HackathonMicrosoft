@@ -31,8 +31,19 @@ var bot = new builder.UniversalBot(connector, function (session) {
 const recognizer = new builder.LuisRecognizer(process.env.LUIS_MODEL_URL);
 bot.recognizer(recognizer);
 
-bot.dialog('SearchHotels', [
+bot.dialog('Buy', [
     (session, args, next) => {
+
+        const ammountEntity = builder.EntityRecognizer.findEntity(args.intent.entities, 'Ammount');
+        const bankEntity = builder.EntityRecognizer.findEntity(args.intent.entities, 'Bank');
+
+        if (!bankEntity) {
+            builder.Prompts.choice(session, "De qual de suas contas?", "Banco do Brasil|Bradesco|Banco Original", { listStyle: builder.ListStyle.button });
+        } else {
+            
+        }
+
+
         session.send(`Welcome to the Hotels finder! We are analyzing your message: 'session.message.text'`);
         // try extracting entities
         const cityEntity = builder.EntityRecognizer.findEntity(args.intent.entities, 'builtin.geography.city');
@@ -74,7 +85,7 @@ bot.dialog('SearchHotels', [
             });
     }
 ]).triggerAction({
-    matches: 'SearchHotels',
+    matches: 'Buy',
     onInterrupted:  session => {
         session.send('Please provide a destination');
     }
