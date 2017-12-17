@@ -33,57 +33,25 @@ bot.recognizer(recognizer);
 
 bot.dialog('Buy', [
     (session, args, next) => {
-
+        
         const ammountEntity = builder.EntityRecognizer.findEntity(args.intent.entities, 'Ammount');
         const bankEntity = builder.EntityRecognizer.findEntity(args.intent.entities, 'Bank');
 
         if (!bankEntity) {
-            builder.Prompts.choice(session, "De qual de suas contas?", "Banco do Brasil|Bradesco|Banco Original", { listStyle: builder.ListStyle.button });
-        } else {
-            
+            builder.Prompts.choice(
+                session, 
+                `De qual de suas contas você quer esses ${ammountEntity.entity}?`, 
+                "Banco do Brasil|Bradesco|Banco Original", 
+                { listStyle: builder.ListStyle.button }
+            );
         }
 
-
-        session.send(`Welcome to the Hotels finder! We are analyzing your message: 'session.message.text'`);
-        // try extracting entities
-        const cityEntity = builder.EntityRecognizer.findEntity(args.intent.entities, 'builtin.geography.city');
-        const airportEntity = builder.EntityRecognizer.findEntity(args.intent.entities, 'AirportCode');
-        if (cityEntity) {
-            // city entity detected, continue to next step
-            session.dialogData.searchType = 'city';
-            next({ response: cityEntity.entity });
-        } else if (airportEntity) {
-            // airport entity detected, continue to next step
-            session.dialogData.searchType = 'airport';
-            next({ response: airportEntity.entity });
-        } else {
-            // no entities detected, ask user for a destination
-            builder.Prompts.text(session, 'Please enter your destination');
-        }
     },
     (session, results) => {
-        const destination = results.response;
-        let message = 'Looking for hotels';
-        if (session.dialogData.searchType === 'airport') {
-            message += ' near %s airport...';
-        } else {
-            message += ' in %s...';
-        }
-        session.send(message, destination);
-        // Async search
-        Store
-            .searchHotels(destination)
-            .then(hotels => {
-                // args
-                session.send(`I found ${hotels.length} hotels:`);
-                let message = new builder.Message()
-                    .attachmentLayout(builder.AttachmentLayout.carousel)
-                    .attachments(hotels.map(hotelAsAttachment));
-                session.send(message);
-                // End
-                session.endDialog();
-            });
+        const bank = results.response;
+        session.send(`Ok, vou dar uma olhada no ${bank.entity}`);
     }
+
 ]).triggerAction({
     matches: 'Buy',
     onInterrupted:  session => {
