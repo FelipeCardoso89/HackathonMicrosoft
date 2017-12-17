@@ -36,7 +36,7 @@
     {
       "name": "Invest",
       "mode": true,
-      "words": "invest,put,keep,save",
+      "words": "investir,colocar,guardar,save",
       "activated": true
     }
   ],
@@ -44,6 +44,17 @@
   "utterances": [
     {
       "text": "Posso gastar 300 reais?",
+      "intent": "Buy",
+      "entities": [
+        {
+          "entity": "Ammount",
+          "startPos": 2,
+          "endPos": 2
+        }
+      ]
+    },
+    {
+      "text": "Consigo usar 2000 reais?",
       "intent": "Buy",
       "entities": [
         {
@@ -66,6 +77,33 @@
           "entity": "Bank",
           "startPos": 5,
           "endPos": 6
+        }
+      ]
+    },
+    {
+      "text": "Consigo usar 2000 do Original?",
+      "intent": "Buy",
+      "entities": [
+        {
+          "entity": "Ammount",
+          "startPos": 2,
+          "endPos": 2
+        },
+        {
+          "entity": "Bank",
+          "startPos": 4,
+          "endPos": 4
+        }
+      ]
+    },
+    {
+      "text": "Consigo usar 2000 reais do Original?",
+      "intent": "Buy",
+      "entities": [
+        {
+          "entity": "Ammount",
+          "startPos": 2,
+          "endPos": 2
         }
       ]
     },

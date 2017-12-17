@@ -65,18 +65,68 @@ bot.dialog('Buy', [
             
             session.send(`Tudo certo! Vou analisar seu consumo e já te digo se esta ok usar esse dinhero.`); 
             session.sendTyping();
-            
+
             request
                 .get('https://sandbox.original.com.br/accounts/v1/balance')
                 .set('Content-Type', 'application/json')
                 .set('authorization', 'Bearer NDYxODIwMTAtZTMwNC0xMWU3LWE3YzAtMDA1MDU2OWE3MzA1OmV5SmhiR2NpT2lKSVV6STFOaUlzSW5SNWNDSTZJa3BYVkNKOS5leUowZVhCbElqb2lUMEYxZEdnaUxDSnBZWFFpT2pFMU1UTTBPVGt6TVRjc0ltVjRjQ0k2TVRVeE16a3pNVE14Tnl3aVlYVmtJam9pTldJMFpqZG1PR1lpTENKcGMzTWlPaUphZFhBdWJXVWdSMkYwWlhkaGVTSXNJbk4xWWlJNklqUTJNVGd5TURFd0xXVXpNRFF0TVRGbE55MWhOMk13TFRBd05UQTFOamxoTnpNd05TSXNJbXAwYVNJNklqUTNORFF4WTJZd0xXVXpNRFF0TVRGbE55MWlZelV4TFRjeE5HUXdZMlkwTWpBeFl5SjkuMkNna1kwMUF3SmlrSGN5eTg3MjRLVk1tVWo3ellSaXdXOVk1OGxxUVRoaw==')
                 .set('developer-key', '28f955c90b3a2940134ff1a970050f569a87facf')
                 .end((error, response) => {
-                    session.send(`Ok, ${response.body.current_balance}`);
-                })
+
+                    setTimeout(function () {
+
+                        var message = `Seu saldo atual é de ${response.body.current_balance}.`
+
+                        if (response.body.current_balance < 0) {
+                            message += `
+                            Avaliando seus habitos de consumo, aconselho você a esperar 2 meses antes de tentar investir esse valor. 
+                            Esse é o tempo previsto para que suas receitas e despesas se equilibrem sendo suficiente para cobrir seus gastos mais frequentes.
+                            `
+                        } else if (response.body.current_balance > 2000) {
+                            message += `
+                            Este valor dividido em 3x não pesa muito no seu orçamento. 
+                            Cada parcela representará cerca de 4% dos recursos que você possui despois de
+                            quitar todas as suas dispesas que percebi serem fixas.`
+                        } else {
+                            message += `Fique a vontade para decidir comprar esse produto agora. Você controla muito bem suas finanças.`
+                        }
+    
+                        session.send(message);
+                
+                        builder.Prompts.choice(
+                            session, 
+                            `Ver plano de quitação de dívidas? `, 
+                            "Sim|Não", 
+                            { listStyle: builder.ListStyle.button }
+                        );
+
+                    }, 5000);
+
+                });
+
         } else {
             session.endDialog(`Tudo bem, fique a vontade para voltar quando quizer`); 
         }
+    },
+    (session, results) => {
+        
+        if (results.response.entity == 'Não') { 
+            session.endDialog(`Tudo bem, fique a vontade para voltar quando quizer`); 
+        } 
+        
+    Store
+        .searchHotels("São Paulo")
+        .then(hotels => {
+            
+            let messageTitle = `Temos ${hotels.length} planos de quitação de dívidas que podem te ajudar a positivar suas finanças. Conte conosco para ajuda-lo sempre.`
+            session.send(messageTitle);
+
+            let message = new builder.Message()
+            .attachmentLayout(builder.AttachmentLayout.carousel)
+            .attachments(hotels.map(hotelAsAttachment));
+            session.send(message);
+            session.endDialog();
+        });
     }
 
 ]).triggerAction({
@@ -108,13 +158,13 @@ if (process.env.IS_SPELL_CORRECTION_ENABLED === 'true') {
 const hotelAsAttachment = hotel => {
     return new builder.HeroCard()
         .title(hotel.name)
-        .subtitle('%d stars. %d reviews. From $%d per night.', hotel.rating, hotel.numberOfReviews, hotel.priceStarting)
+        .subtitle('%d curtidas. %d comentários. A partir de $%d ao mês.', hotel.rating, hotel.numberOfReviews, hotel.priceStarting)
         .images([new builder.CardImage().url(hotel.image)])
         .buttons([
             new builder.CardAction()
-                .title('More details')
+                .title('Mais Detalhes')
                 .type('openUrl')
-                .value('https://www.bing.com/search?q=hotels+in+' + encodeURIComponent(hotel.location))
+                .value('https://www.bing.com/search?q=telecon+in+' + encodeURIComponent(hotel.location))
         ]);
 }
 
