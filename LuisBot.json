@@ -8,219 +8,166 @@
       "name": "None"
     },
     {
-      "name": "SearchHotels"
+      "name": "Buy"
     },
     {
-      "name": "ShowHotelsReviews"
-    },
-    {
-      "name": "Help"
+      "name": "Invest"
     }
   ],
   "entities": [
     {
-      "name": "Hotel"
+      "name": "Ammount"
     },
     {
-      "name": "AirportCode"
+      "name": "Bank"
     }
   ],
   "composites": [],
   "closedLists": [],
-  "bing_entities": [
-    "geography"
-  ],
+  "bing_entities": ["geography"],
   "actions": [],
   "model_features": [
     {
-      "name": "Near",
+      "name": "Spend",
       "mode": true,
-      "words": "near,around,close,nearby",
+      "words": "gastar,usar,pegar,sacar",
       "activated": true
     },
     {
-      "name": "Show",
+      "name": "Invest",
       "mode": true,
-      "words": "show,find,look,search",
+      "words": "investir,colocar,guardar,save",
       "activated": true
     }
   ],
-  "regex_features": [
-    {
-      "name": "AirportCodeRegex",
-      "pattern": "[a-z]{3}",
-      "activated": true
-    }
-  ],
+  "regex_features": [],
   "utterances": [
     {
-      "text": "look for hotels in miami",
-      "intent": "SearchHotels",
-      "entities": []
-    },
-    {
-      "text": "search for hotels in seattle",
-      "intent": "SearchHotels",
-      "entities": []
-    },
-    {
-      "text": "show me hotels in california",
-      "intent": "SearchHotels",
-      "entities": []
-    },
-    {
-      "text": "show me the reviews of the amazing bot resort",
-      "intent": "ShowHotelsReviews",
+      "text": "Posso gastar 300 reais?",
+      "intent": "Buy",
       "entities": [
         {
-          "entity": "Hotel",
+          "entity": "Ammount",
+          "startPos": 2,
+          "endPos": 2
+        }
+      ]
+    },
+    {
+      "text": "Consigo usar 2000 reais?",
+      "intent": "Buy",
+      "entities": [
+        {
+          "entity": "Ammount",
+          "startPos": 2,
+          "endPos": 2
+        }
+      ]
+    },
+    {
+      "text": "Quero usar 4000 reais do Banco Original",
+      "intent": "Buy",
+      "entities": [
+        {
+          "entity": "Ammount",
+          "startPos": 2,
+          "endPos": 2
+        },
+        {
+          "entity": "Bank",
           "startPos": 5,
-          "endPos": 8
-        }
-      ]
-    },
-    {
-      "text": "can i see the reviews of extended bot hotel?",
-      "intent": "ShowHotelsReviews",
-      "entities": [
-        {
-          "entity": "Hotel",
-          "startPos": 6,
-          "endPos": 8
-        }
-      ]
-    },
-    {
-      "text": "find reviews of hotelxya",
-      "intent": "ShowHotelsReviews",
-      "entities": [
-        {
-          "entity": "Hotel",
-          "startPos": 3,
-          "endPos": 3
-        }
-      ]
-    },
-    {
-      "text": "show me reviews of the amazing hotel",
-      "intent": "ShowHotelsReviews",
-      "entities": [
-        {
-          "entity": "Hotel",
-          "startPos": 4,
           "endPos": 6
         }
       ]
     },
     {
-      "text": "what can i do?",
-      "intent": "Help",
-      "entities": []
-    },
-    {
-      "text": "help me",
-      "intent": "Help",
-      "entities": []
-    },
-    {
-      "text": "what are the available options?",
-      "intent": "Help",
-      "entities": []
-    },
-    {
-      "text": "i need help",
-      "intent": "Help",
-      "entities": []
-    },
-    {
-      "text": "best hotels in seattle",
-      "intent": "SearchHotels",
-      "entities": []
-    },
-    {
-      "text": "hotels in los angeles",
-      "intent": "SearchHotels",
-      "entities": []
-    },
-    {
-      "text": "can you show me hotels from los angeles?",
-      "intent": "SearchHotels",
-      "entities": []
-    },
-    {
-      "text": "can you show me the reviews of the amazing resort & hotel",
-      "intent": "ShowHotelsReviews",
+      "text": "Consigo usar 2000 do Original?",
+      "intent": "Buy",
       "entities": [
         {
-          "entity": "Hotel",
-          "startPos": 7,
-          "endPos": 11
+          "entity": "Ammount",
+          "startPos": 2,
+          "endPos": 2
+        },
+        {
+          "entity": "Bank",
+          "startPos": 4,
+          "endPos": 4
         }
       ]
     },
     {
-      "text": "what are the reviews of the hotel bot framework?",
-      "intent": "ShowHotelsReviews",
+      "text": "Consigo usar 2000 reais do Original?",
+      "intent": "Buy",
       "entities": [
         {
-          "entity": "Hotel",
-          "startPos": 5,
-          "endPos": 8
+          "entity": "Ammount",
+          "startPos": 2,
+          "endPos": 2
         }
       ]
     },
     {
-      "text": "find hotels near eze",
-      "intent": "SearchHotels",
+      "text": "Posso usar 2000 do Original?",
+      "intent": "Buy",
       "entities": [
         {
-          "entity": "AirportCode",
-          "startPos": 3,
-          "endPos": 3
+          "entity": "Ammount",
+          "startPos": 2,
+          "endPos": 2
+        },
+        {
+          "entity": "Bank",
+          "startPos": 4,
+          "endPos": 4
         }
       ]
     },
     {
-      "text": "where can i stay near nnn?",
-      "intent": "SearchHotels",
+      "text": "Posso pegar 200 do Bradesco?",
+      "intent": "Buy",
       "entities": [
         {
-          "entity": "AirportCode",
-          "startPos": 5,
-          "endPos": 5
+          "entity": "Ammount",
+          "startPos": 2,
+          "endPos": 2
+        },
+        {
+          "entity": "Bank",
+          "startPos": 4,
+          "endPos": 4
         }
       ]
     },
     {
-      "text": "show hotels near att airport",
-      "intent": "SearchHotels",
+      "text": "Posso guardar 500 no Original?",
+      "intent": "Invest",
       "entities": [
         {
-          "entity": "AirportCode",
-          "startPos": 3,
-          "endPos": 3
+          "entity": "Ammount",
+          "startPos": 2,
+          "endPos": 2
+        },
+        {
+          "entity": "Bank",
+          "startPos": 4,
+          "endPos": 4
         }
       ]
     },
     {
-      "text": "find hotels near agl",
-      "intent": "SearchHotels",
+      "text": "Quero colocar 6000 no Banco Original?",
+      "intent": "Invest",
       "entities": [
         {
-          "entity": "AirportCode",
-          "startPos": 3,
-          "endPos": 3
-        }
-      ]
-    },
-    {
-      "text": "find hotels around eze airport",
-      "intent": "SearchHotels",
-      "entities": [
+          "entity": "Ammount",
+          "startPos": 2,
+          "endPos": 2
+        },
         {
-          "entity": "AirportCode",
-          "startPos": 3,
-          "endPos": 3
+          "entity": "Bank",
+          "startPos": 4,
+          "endPos": 4
         }
       ]
     }

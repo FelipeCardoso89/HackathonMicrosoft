@@ -13,12 +13,12 @@ const searchHotels = (destination) => {
         hotels = hotels.map((hotel, index) => {
             const i = index + 1;
             return {
-                name: `${destination} Hotel ${i}`,
+                name: `Empresa de Quitação ${i}`,
                 location: destination,
                 rating: Math.ceil(Math.random() * 5),
                 numberOfReviews: Math.floor(Math.random() * 5000) + 1,
-                priceStarting: Math.floor(Math.random() * 450) + 80,
-                image: `https://placeholdit.imgix.net/~text?txtsize=35&txt=Hotel+${i}&w=500&h=260`
+                priceStarting: Math.random() * 0.10,
+                image: `http://icons.iconarchive.com/icons/custom-icon-design/pretty-office-11/512/shop-icon.png`
             };
         });
         hotels.sort((a, b) => { return a.priceStarting - b.priceStarting; });

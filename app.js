@@ -5,6 +5,8 @@ const builder = require('botbuilder');
 const restify = require('restify');
 const Store = require('./store');
 const spellService = require('./spell-service');
+const http = require('http');
+const request = require('superagent');
 
 // Setup Restify Server
 const server = restify.createServer();
@@ -31,77 +33,111 @@ var bot = new builder.UniversalBot(connector, function (session) {
 const recognizer = new builder.LuisRecognizer(process.env.LUIS_MODEL_URL);
 bot.recognizer(recognizer);
 
-bot.dialog('SearchHotels', [
+bot.dialog('Buy', [
     (session, args, next) => {
-        session.send(`Welcome to the Hotels finder! We are analyzing your message: 'session.message.text'`);
-        // try extracting entities
-        const cityEntity = builder.EntityRecognizer.findEntity(args.intent.entities, 'builtin.geography.city');
-        const airportEntity = builder.EntityRecognizer.findEntity(args.intent.entities, 'AirportCode');
-        if (cityEntity) {
-            // city entity detected, continue to next step
-            session.dialogData.searchType = 'city';
-            next({ response: cityEntity.entity });
-        } else if (airportEntity) {
-            // airport entity detected, continue to next step
-            session.dialogData.searchType = 'airport';
-            next({ response: airportEntity.entity });
+
+        session.dialogData.ammount = builder.EntityRecognizer.findEntity(args.intent.entities, 'Ammount');
+        session.dialogData.bank = builder.EntityRecognizer.findEntity(args.intent.entities, 'Bank');
+
+        if (!session.dialogData.bank) {
+            builder.Prompts.choice(
+                session, 
+                `De qual de suas contas você quer esses ${session.dialogData.ammount.entity}?`, 
+                "Itaú|Bradesco|Banco Original", 
+                { listStyle: builder.ListStyle.button }
+            );
         } else {
-            // no entities detected, ask user for a destination
-            builder.Prompts.text(session, 'Please enter your destination');
+            next();
         }
     },
     (session, results) => {
-        const destination = results.response;
-        let message = 'Looking for hotels';
-        if (session.dialogData.searchType === 'airport') {
-            message += ' near %s airport...';
-        } else {
-            message += ' in %s...';
+
+        if (!session.dialogData.bank) {
+            session.dialogData.bank = results.response;
         }
-        session.send(message, destination);
-        // Async search
-        Store
-            .searchHotels(destination)
-            .then(hotels => {
-                // args
-                session.send(`I found ${hotels.length} hotels:`);
-                let message = new builder.Message()
-                    .attachmentLayout(builder.AttachmentLayout.carousel)
-                    .attachments(hotels.map(hotelAsAttachment));
-                session.send(message);
-                // End
-                session.endDialog();
-            });
+
+        builder.Prompts.choice(
+            session, 
+            `Ok, vou precisar da sua permissão para accessar o ${session.dialogData.bank.entity}. Tudo bem?`, 
+            "Sim|Não", 
+            { listStyle: builder.ListStyle.button }
+        );
+    },
+    (session, results) => {
+
+        if (results.response.entity == 'Sim') {
+            
+            session.send(`Tudo certo! Vou analisar seu consumo e já te digo se esta ok usar esse dinhero.`); 
+            session.sendTyping();
+
+            request
+                .get('https://sandbox.original.com.br/accounts/v1/balance')
+                .set('Content-Type', 'application/json')
+                .set('authorization', 'Bearer NDYxODIwMTAtZTMwNC0xMWU3LWE3YzAtMDA1MDU2OWE3MzA1OmV5SmhiR2NpT2lKSVV6STFOaUlzSW5SNWNDSTZJa3BYVkNKOS5leUowZVhCbElqb2lUMEYxZEdnaUxDSnBZWFFpT2pFMU1UTTBPVGt6TVRjc0ltVjRjQ0k2TVRVeE16a3pNVE14Tnl3aVlYVmtJam9pTldJMFpqZG1PR1lpTENKcGMzTWlPaUphZFhBdWJXVWdSMkYwWlhkaGVTSXNJbk4xWWlJNklqUTJNVGd5TURFd0xXVXpNRFF0TVRGbE55MWhOMk13TFRBd05UQTFOamxoTnpNd05TSXNJbXAwYVNJNklqUTNORFF4WTJZd0xXVXpNRFF0TVRGbE55MWlZelV4TFRjeE5HUXdZMlkwTWpBeFl5SjkuMkNna1kwMUF3SmlrSGN5eTg3MjRLVk1tVWo3ellSaXdXOVk1OGxxUVRoaw==')
+                .set('developer-key', '28f955c90b3a2940134ff1a970050f569a87facf')
+                .end((error, response) => {
+
+                    setTimeout(function () {
+
+                        var message = `Seu saldo atual é de ${response.body.current_balance}.`
+
+                        if (response.body.current_balance < 0) {
+                            message += `
+                            Avaliando seus habitos de consumo, aconselho você a esperar 2 meses antes de tentar investir esse valor. 
+                            Esse é o tempo previsto para que suas receitas e despesas se equilibrem sendo suficiente para cobrir seus gastos mais frequentes.
+                            `
+                        } else if (response.body.current_balance > 2000) {
+                            message += `
+                            Este valor dividido em 3x não pesa muito no seu orçamento. 
+                            Cada parcela representará cerca de 4% dos recursos que você possui despois de
+                            quitar todas as suas dispesas que percebi serem fixas.`
+                        } else {
+                            message += `Fique a vontade para decidir comprar esse produto agora. Você controla muito bem suas finanças.`
+                        }
+    
+                        session.send(message);
+                
+                        builder.Prompts.choice(
+                            session, 
+                            `Ver plano de quitação de dívidas? `, 
+                            "Sim|Não", 
+                            { listStyle: builder.ListStyle.button }
+                        );
+
+                    }, 5000);
+
+                });
+
+        } else {
+            session.endDialog(`Tudo bem, fique a vontade para voltar quando quizer`); 
+        }
+    },
+    (session, results) => {
+        
+        if (results.response.entity == 'Não') { 
+            session.endDialog(`Tudo bem, fique a vontade para voltar quando quizer`); 
+        } 
+        
+    Store
+        .searchHotels("São Paulo")
+        .then(hotels => {
+            
+            let messageTitle = `Temos ${hotels.length} planos de quitação de dívidas que podem te ajudar a positivar suas finanças. Conte conosco para ajuda-lo sempre.`
+            session.send(messageTitle);
+
+            let message = new builder.Message()
+            .attachmentLayout(builder.AttachmentLayout.carousel)
+            .attachments(hotels.map(hotelAsAttachment));
+            session.send(message);
+            session.endDialog();
+        });
     }
+
 ]).triggerAction({
-    matches: 'SearchHotels',
+    matches: 'Buy',
     onInterrupted:  session => {
         session.send('Please provide a destination');
     }
-});
-
-bot.dialog('ShowHotelsReviews', (session, args) => {
-    // retrieve hotel name from matched entities
-    const hotelEntity = builder.EntityRecognizer.findEntity(args.intent.entities, 'Hotel');
-    if (hotelEntity) {
-        session.send(`Looking for reviews of '${hotelEntity.entity}'...`);
-        Store
-            .searchHotelReviews(hotelEntity.entity)
-            .then(reviews => {
-                let message = new builder.Message()
-                    .attachmentLayout(builder.AttachmentLayout.carousel)
-                    .attachments(reviews.map(reviewAsAttachment));
-                session.endDialog(message);
-            });
-    }
-}).triggerAction({
-    matches: 'ShowHotelsReviews'
-});
-
-bot.dialog('Help', session => {
-    session.endDialog(`Hi! Try asking me things like 'search hotels in Seattle', 'search hotels near LAX airport' or 'show me the reviews of The Bot Resort'`);
-}).triggerAction({
-    matches: 'Help'
 });
 
 // Spell Check
@@ -126,13 +162,13 @@ if (process.env.IS_SPELL_CORRECTION_ENABLED === 'true') {
 const hotelAsAttachment = hotel => {
     return new builder.HeroCard()
         .title(hotel.name)
-        .subtitle('%d stars. %d reviews. From $%d per night.', hotel.rating, hotel.numberOfReviews, hotel.priceStarting)
+        .subtitle(`${hotel.rating} curtidas. ${hotel.numberOfReviews} comentários. A partir de ${hotel.priceStarting.toFixed(2)}% ao mês.`)
         .images([new builder.CardImage().url(hotel.image)])
         .buttons([
             new builder.CardAction()
-                .title('More details')
+                .title('Mais Detalhes')
                 .type('openUrl')
-                .value('https://www.bing.com/search?q=hotels+in+' + encodeURIComponent(hotel.location))
+                .value('https://www.bing.com/search?q=telecon+in+' + encodeURIComponent(hotel.location))
         ]);
 }
 

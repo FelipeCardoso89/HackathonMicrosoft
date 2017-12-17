@@ -48,10 +48,10 @@ bot.recognizer(recognizer);
 Intent recognizers return matches as named intents. To match against an intent from a recognizer you pass the name of the intent you want to handle to [IntentDialog.matches()](https://docs.botframework.com/en-us/node/builder/chat-reference/classes/_botbuilder_d_.intentdialog#matches) or use the dialog's [triggerAction()](https://docs.botframework.com/en-us/node/builder/chat-reference/classes/_botbuilder_d_.intentdialog.html#triggeraction) by specifing the intent name with [matches](https://docs.botframework.com/en-us/node/builder/chat-reference/interfaces/_botbuilder_d_.itriggeractionoptions.html#matches) property. See how the bot matches the [`SearchHotels`](app.js#L77), [`ShowHotelsReviews`](app.js#L98) and [`Help`](app.js#L104) intents.
 
 ```javascript
-bot.dialog('SearchHotels', [
+bot.dialog('Buy', [
     // ... waterfall dialog ...
 ]).triggerAction({
-    matches: 'SearchHotels'
+    matches: 'Buy'
 });
 
 bot.dialog('ShowHotelsReviews', (session, args) => {
@@ -93,7 +93,7 @@ In our sample, we are using a [waterfall dialog](https://docs.microsoft.com/en-u
 Our bot tries to check if an entity of city or airport type were [matched and forwards it](app.js#L37-L44) to the next step. If that's not the case, the user is [prompted with a destination](app.js#L47). The [next step](app.js#L50) will receive the destination or airport code in the `results` argument.
 
 ```javascript
-bot.dialog('SearchHotels', [
+bot.dialog('Buy', [
     (session, args, next) => {
         session.send(`Welcome to the Hotels finder! We are analyzing your message: 'session.message.text'`);
         // try extracting entities
@@ -136,7 +136,7 @@ bot.dialog('SearchHotels', [
             });
     }
 ]).triggerAction({
-    matches: 'SearchHotels',
+    matches: 'Buy',
     onInterrupted:  session => {
         session.send('Please provide a destination');
     }
